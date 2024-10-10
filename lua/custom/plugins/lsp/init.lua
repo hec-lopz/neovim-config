@@ -88,11 +88,7 @@ local servers = {
   --    https://github.com/pmizio/typescript-tools.nvim
   --
   -- But for many setups, the LSP (`ts_ls`) will work just fine
-  ts_ls = {
-    init_options = {
-      preferences = { includeCompletionsForModuleExports = false },
-    },
-  },
+  ts_ls = {},
   html = { filetypes = { 'html', 'twig', 'hbs' } },
   lua_ls = {
     -- cmd = {...},
@@ -156,6 +152,7 @@ return {
     }
     require('mason-null-ls').setup {
       automatic_installation = false,
+      ensure_installed = {},
       handlers = {
         function(source_name, methods)
           require('mason-null-ls').default_setup(source_name, methods)
