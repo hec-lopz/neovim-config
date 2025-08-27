@@ -3,10 +3,6 @@
 
 return {
   'nvim-neo-tree/neo-tree.nvim',
-  keys = {
-    -- { '<leader>e', ':Neotree reveal current<CR>', desc = 'NeoTree reveal', silent = true },
-    { '\\', ':Neotree reveal current<CR>', desc = 'NeoTree reveal current', silent = true },
-  },
   opts = {
     event_handlers = {
       {
