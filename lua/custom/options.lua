@@ -24,6 +24,10 @@ vim.opt.shortmess:append 'c'
 vim.opt.whichwrap:append '<,>,[,],h,l'
 vim.o.swapfile = false
 
+-- Avante suggestions
+-- views can only be fully collapsed with the global statusline
+vim.opt.laststatus = 3
+
 -- Folding
 vim.wo.foldmethod = 'expr'
 vim.o.foldenable = false
