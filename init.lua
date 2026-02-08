@@ -944,20 +944,21 @@ require('lazy').setup({
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
+    'rebelot/kanagawa.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     config = function()
+      -- Remueve setup call para usar configuración por defecto de Kanagawa
       ---@diagnostic disable-next-line: missing-fields
-      require('tokyonight').setup {
-        styles = {
-          comments = { italic = false }, -- Disable italics in comments
-        },
-      }
+      -- require('kanagawa').setup {
+      --   styles = {
+      --     comments = { italic = false }, -- Disable italics in comments
+      --   },
+      -- }
 
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'kanagawa'
     end,
   },
 
@@ -988,16 +989,34 @@ require('lazy').setup({
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
       local statusline = require 'mini.statusline'
+      local get_cwd_name = function()
+        local cwd = vim.fn.getcwd()
+        return vim.fs.basename(cwd)
+      end
+      local filename_format = '%f%m%r' -- file name with modified and readonly status
       -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
+      statusline.setup {
+        use_icons = vim.g.have_nerd_font,
+        content = {
+          inactive = function()
+            return statusline.combine_groups {
+              string.format('[%s] %s', get_cwd_name(), filename_format),
+            }
+          end,
+        },
+      }
 
       -- You can configure sections in the statusline by overriding their
       -- default behavior. For example, here we set the section for
       -- cursor location to LINE:COLUMN
-      ---@diagnostic disable-next-line: duplicate-set-field
+      ---@diagnostic disable: duplicate-set-field
       statusline.section_location = function()
         return '%2l:%-2v'
       end
+      statusline.section_filename = function()
+        return string.format('[%s] %s', get_cwd_name(), filename_format)
+      end
+      ---@diagnostic enable: duplicate-set-field
 
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
