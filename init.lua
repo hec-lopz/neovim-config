@@ -860,7 +860,7 @@ require('lazy').setup({
       {
         'Kaiser-Yang/blink-cmp-avante',
         -- Deshabilitando Avante para probar claude code
-        enabled = false,
+        enabled = true,
       },
     },
     --- @module 'blink.cmp'
@@ -910,14 +910,14 @@ require('lazy').setup({
 
       sources = {
         -- Deshabilitando Avante para probar claude code
-        -- default = { 'avante', 'lsp', 'path', 'snippets', 'lazydev' },
-        default = { 'lsp', 'path', 'snippets', 'lazydev' },
+        default = { 'avante', 'lsp', 'path', 'snippets', 'lazydev' },
+        -- default = { 'lsp', 'path', 'snippets', 'lazydev' },
         providers = {
           avante = {
             module = 'blink-cmp-avante',
             name = 'Avante',
             opts = {},
-            enabled = false,
+            enabled = true,
           },
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
         },
@@ -989,18 +989,59 @@ require('lazy').setup({
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
       local statusline = require 'mini.statusline'
-      local get_cwd_name = function()
+
+      local get_filename_with_project_name = function()
         local cwd = vim.fn.getcwd()
-        return vim.fs.basename(cwd)
+        local project_name = vim.fs.basename(cwd)
+        local filename_format = '%f%m%r' -- file name with modified and readonly status
+        return string.format('[%s] %s', project_name, filename_format)
       end
-      local filename_format = '%f%m%r' -- file name with modified and readonly status
-      -- set use_icons to true if you have a Nerd Font
+
+      local is_statusline_hidden = function()
+        -- Obtener información sobre la ventana y el tipo de buffer
+        local buftype = vim.bo.buftype
+        local filetype = vim.bo.filetype
+
+        -- Evalua si el buffer es de 'avante' o cumple ciertas condiciones
+        return buftype == 'nofile' or filetype == 'avante'
+      end
+
       statusline.setup {
+        -- set use_icons to true if you have a Nerd Font
         use_icons = vim.g.have_nerd_font,
         content = {
           inactive = function()
+            if is_statusline_hidden() then
+              return ''
+            end
+
             return statusline.combine_groups {
-              string.format('[%s] %s', get_cwd_name(), filename_format),
+              get_filename_with_project_name(),
+            }
+          end,
+          active = function()
+            if is_statusline_hidden() then
+              return ''
+            end
+
+            local mode, mode_hl = MiniStatusline.section_mode { trunc_width = 120 }
+            local git = MiniStatusline.section_git { trunc_width = 40 }
+            local diff = MiniStatusline.section_diff { trunc_width = 75 }
+            local diagnostics = MiniStatusline.section_diagnostics { trunc_width = 75 }
+            local lsp = MiniStatusline.section_lsp { trunc_width = 75 }
+            local filename = get_filename_with_project_name()
+            local fileinfo = MiniStatusline.section_fileinfo { trunc_width = 120 }
+            local location = '%2l:%-2v'
+            local search = MiniStatusline.section_searchcount { trunc_width = 75 }
+
+            return MiniStatusline.combine_groups {
+              { hl = mode_hl, strings = { mode } },
+              { hl = 'MiniStatuslineDevinfo', strings = { git, diff, diagnostics, lsp } },
+              '%<', -- Mark general truncate point
+              { hl = 'MiniStatuslineFilename', strings = { filename } },
+              '%=', -- End left alignment
+              { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+              { hl = mode_hl, strings = { search, location } },
             }
           end,
         },
@@ -1010,12 +1051,12 @@ require('lazy').setup({
       -- default behavior. For example, here we set the section for
       -- cursor location to LINE:COLUMN
       ---@diagnostic disable: duplicate-set-field
-      statusline.section_location = function()
-        return '%2l:%-2v'
-      end
-      statusline.section_filename = function()
-        return string.format('[%s] %s', get_cwd_name(), filename_format)
-      end
+      -- statusline.section_location = function()
+      --   return '%2l:%-2v'
+      -- end
+      -- statusline.section_filename = function()
+      --   return string.format('[%s] %s', get_cwd_name(), filename_format)
+      -- end
       ---@diagnostic enable: duplicate-set-field
 
       -- ... and there is more!

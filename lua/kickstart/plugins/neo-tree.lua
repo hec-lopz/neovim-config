@@ -10,9 +10,10 @@ return {
     'MunifTanjim/nui.nvim',
   },
   lazy = false,
-  keys = {
-    { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
-  },
+  -- Disabling kickstart's config for preference on custom keybinding
+  -- keys = {
+  -- { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
+  -- },
   opts = {
     filesystem = {
       window = {
