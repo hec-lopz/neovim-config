@@ -1,11 +1,9 @@
 return {
-  "ggandor/leap.nvim",
+  'ggandor/leap.nvim',
+  url = 'https://codeberg.org/andyg/leap.nvim',
   opts = {},
-  config = function ()
-    require('leap').create_default_mappings()
-    require('leap').opts.special_keys.prev_target = '<bs>'
-    require('leap').opts.special_keys.prev_group = '<bs>'
-    require('leap.user').set_repeat_keys('<cr>', '<bs>')
-  end
-
+  config = function()
+    vim.keymap.set({ 'n', 'x', 'o' }, 's', '<Plug>(leap)')
+    vim.keymap.set('n', 'S', '<Plug>(leap-from-window)')
+  end,
 }

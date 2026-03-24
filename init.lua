@@ -482,9 +482,7 @@ require('lazy').setup({
       )
 
       -- Shortcut for searching your Neovim configuration files
-      vim.keymap.set('n', '<leader>sn', function()
-        builtin.find_files { cwd = '~/.dotfiles/neovim/' }
-      end, { desc = '[S]earch [N]eovim files' })
+      vim.keymap.set('n', '<leader>sn', function() builtin.find_files { cwd = '~/.dotfiles/neovim/' } end, { desc = '[S]earch [N]eovim files' })
     end,
   },
 
@@ -721,9 +719,7 @@ require('lazy').setup({
     keys = {
       {
         '<leader>lf',
-        function()
-          require('conform').format { async = true, lsp_format = 'never' }
-        end,
+        function() require('conform').format { async = true, lsp_format = 'never' } end,
         mode = '',
         desc = '[F]ormat buffer',
       },
@@ -805,9 +801,7 @@ require('lazy').setup({
           --    https://github.com/rafamadriz/friendly-snippets
           {
             'rafamadriz/friendly-snippets',
-            config = function()
-              require('luasnip.loaders.from_vscode').lazy_load()
-            end,
+            config = function() require('luasnip.loaders.from_vscode').lazy_load() end,
           },
         },
         opts = {},
@@ -975,18 +969,14 @@ require('lazy').setup({
         use_icons = vim.g.have_nerd_font,
         content = {
           inactive = function()
-            if is_statusline_hidden() then
-              return ''
-            end
+            if is_statusline_hidden() then return '' end
 
             return statusline.combine_groups {
               get_filename_with_project_name(),
             }
           end,
           active = function()
-            if is_statusline_hidden() then
-              return ''
-            end
+            if is_statusline_hidden() then return '' end
 
             local mode, mode_hl = MiniStatusline.section_mode { trunc_width = 120 }
             local git = MiniStatusline.section_git { trunc_width = 40 }
@@ -1032,33 +1022,47 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     lazy = false,
     build = ':TSUpdate',
-    branch = 'main',
+    branch = 'master',
+    opts = {
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      -- Autoinstall languages that are not installed
+      auto_install = true,
+      highlight = {
+        enable = true,
+        -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
+        --  If you are experiencing weird indenting issues, add the language to
+        --  the list of additional_vim_regex_highlighting and disabled languages for indent.
+        additional_vim_regex_highlighting = { 'ruby' },
+      },
+      indent = { enable = true, disable = { 'ruby' } },
+    },
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter-intro`
-    config = function()
-      local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
-      require('nvim-treesitter').install(parsers)
-      vim.api.nvim_create_autocmd('FileType', {
-        callback = function(args)
-          local buf, filetype = args.buf, args.match
-
-          local language = vim.treesitter.language.get_lang(filetype)
-          if not language then return end
-
-          -- check if parser exists and load it
-          if not vim.treesitter.language.add(language) then return end
-          -- enables syntax highlighting and other treesitter features
-          vim.treesitter.start(buf, language)
-
-          -- enables treesitter based folds
-          -- for more info on folds see `:help folds`
-          -- vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-          -- vim.wo.foldmethod = 'expr'
-
-          -- enables treesitter based indentation
-          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-        end,
-      })
-    end,
+    -- Aparentemente configuracion para Neovim 0.12, pero no funciona en 0.11.6
+    -- config = function()
+    --   local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
+    --   require('nvim-treesitter').install(parsers)
+    --   vim.api.nvim_create_autocmd('FileType', {
+    --     callback = function(args)
+    --       local buf, filetype = args.buf, args.match
+    --
+    --       local language = vim.treesitter.language.get_lang(filetype)
+    --       if not language then return end
+    --
+    --       -- check if parser exists and load it
+    --       if not vim.treesitter.language.add(language) then return end
+    --       -- enables syntax highlighting and other treesitter features
+    --       vim.treesitter.start(buf, language)
+    --
+    --       -- enables treesitter based folds
+    --       -- for more info on folds see `:help folds`
+    --       -- vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+    --       -- vim.wo.foldmethod = 'expr'
+    --
+    --       -- enables treesitter based indentation
+    --       vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+    --     end,
+    --   })
+    -- end,
   },
 
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
